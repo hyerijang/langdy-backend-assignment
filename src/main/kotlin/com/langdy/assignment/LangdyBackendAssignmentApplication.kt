@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class LangdyBackendAssignmentApplication
 
 fun main(args: Array<String>) {
-	runApplication<LangdyBackendAssignmentApplication>(*args)
+    runApplication<LangdyBackendAssignmentApplication>(*args)
 }

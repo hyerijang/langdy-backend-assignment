@@ -16,7 +16,7 @@ class Student(
     var id: Long? = null,
     var name: String,
     @Enumerated(EnumType.STRING)
-    var os: Os = Os.ANDROID
+    var os: Os = Os.ANDROID,
 ) {
     // JPA requires a no-arg constructor
 

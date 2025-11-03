@@ -12,9 +12,8 @@ class Teacher(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    var name: String
+    var name: String,
 ) {
-
     @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
     val lessons: MutableList<Lesson> = mutableListOf()
 

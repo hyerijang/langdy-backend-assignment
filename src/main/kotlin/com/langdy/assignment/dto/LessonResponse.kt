@@ -12,11 +12,10 @@ data class LessonResponse(
     val status: LessonStatus,
     val startAt: LocalDateTime,
     val endAt: LocalDateTime,
-){
-
+) {
     companion object {
-        fun from(lesson: Lesson): LessonResponse {
-            return LessonResponse(
+        fun from(lesson: Lesson): LessonResponse =
+            LessonResponse(
                 id = lesson.id!!,
                 courseId = lesson.course!!.id!!,
                 teacherId = lesson.teacher!!.id!!,
@@ -25,6 +24,5 @@ data class LessonResponse(
                 startAt = lesson.startAt,
                 endAt = lesson.endAt,
             )
-        }
     }
 }
