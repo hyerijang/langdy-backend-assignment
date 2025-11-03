@@ -5,6 +5,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "1.9.25"
 	kotlin("kapt") version "1.9.25"
+	kotlin("plugin.serialization") version "1.9.25"
 }
 
 group = "com.langdy"
@@ -47,6 +48,8 @@ dependencies {
     kapt("com.querydsl:querydsl-apt:5.0.0:jakarta")
     kapt("jakarta.annotation:jakarta.annotation-api")
     kapt("jakarta.persistence:jakarta.persistence-api")
+
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 }
 
 kapt {
