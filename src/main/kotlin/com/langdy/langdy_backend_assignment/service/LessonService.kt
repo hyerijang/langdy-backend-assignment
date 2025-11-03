@@ -24,42 +24,41 @@ class LessonService(
 ) {
     fun findAvailableTeachers(courseId: Long, startAtStr: String): List<TeacherDto> {
         val startAt = parseStartAt(startAtStr)
-
-        // All teachers can teach any course (assumption)
-        val teachers = teacherRepository.findAll()
-        return teachers.filter { t ->
-            if (t.id == null) return@filter false
-            !lessonRepository.existsByTeacherIdAndStartAtAndStatus(t.id!!, startAt, LessonStatus.BOOKED)
-        }.map { TeacherDto(it.id!!, it.name) }
+        // 분 검사 (:00 또는 :30) 및 초/나노초가 0인지 확인
+        validateStartAt(startAt)
+        // 수업 가능한 선생님 목록 조회
+        return teacherRepository.findAvailableTeachers(courseId, startAt)
     }
 
     fun createLesson(request: LessonRequest, studentId: Long): LessonResponse {
-        val startAt = parseStartAt(request.startAt ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "startAt is required"))
-        val courseId = request.courseId ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "courseId is required")
-        val teacherId = request.teacherId ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "teacherId is required")
+        val startAt =
+            parseStartAt(request.startAt ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "startAt은 필수입니다"))
+        val courseId = request.courseId ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "courseId는 필수입니다")
+        val teacherId = request.teacherId ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "teacherId는 필수입니다")
 
-        // Validate minute boundary (00 or 30) and seconds/nanos
-        if (startAt.minute % 30 != 0 || startAt.second != 0 || startAt.nano != 0) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "startAt must be on :00 or :30 with zero seconds")
+        // 분 검사 (:00 또는 :30) 및 초/나노초가 0인지 확인
+        validateStartAt(startAt)
+
+        val teacher = teacherRepository.findById(teacherId)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "선생님을 찾을 수 없습니다") }
+        val student = studentRepository.findById(studentId)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "학생을 찾을 수 없습니다") }
+        val course = courseRepository.findById(courseId)
+            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "강좌를 찾을 수 없습니다") }
+
+        // 선생님과 학생의 해당 시간 예약 여부 확인
+        if (lessonRepository.existsBookedLessonForTeacher(teacherId, startAt, LessonStatus.BOOKED)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "요청한 시간에 선생님이 예약되어 있습니다")
         }
-
-        val teacher = teacherRepository.findById(teacherId).orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "teacher not found") }
-        val student = studentRepository.findById(studentId).orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "student not found") }
-        val course = courseRepository.findById(courseId).orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "course not found") }
-
-        // Check existing bookings for teacher and student at the given startAt
-        if (lessonRepository.existsByTeacherIdAndStartAtAndStatus(teacherId, startAt, LessonStatus.BOOKED)) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "teacher is not available at requested time")
-        }
-        if (lessonRepository.existsByStudentIdAndStartAtAndStatus(studentId, startAt, LessonStatus.BOOKED)) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "student is not available at requested time")
+        if (lessonRepository.existsBookedLessonForStudent(studentId, startAt, LessonStatus.BOOKED)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT, "요청한 시간에 학생이 예약되어 있습니다")
         }
 
         val endAt = startAt.plusMinutes(20)
         val lesson = Lesson(
-            courseId = courseId,
-            teacherId = teacherId,
-            studentId = studentId,
+            course = course,
+            teacher = teacher,
+            student = student,
             status = LessonStatus.BOOKED,
             startAt = startAt,
             endAt = endAt
@@ -68,9 +67,18 @@ class LessonService(
 
         return LessonResponse(
             id = saved.id!!,
-            courseId = saved.courseId,
-            teacherId = saved.teacherId,
-            studentId = saved.studentId,
+            courseId = saved.course?.id ?: throw ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "수업에 강좌 정보가 없습니다"
+            ),
+            teacherId = saved.teacher?.id ?: throw ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "수업에 선생님 정보가 없습니다"
+            ),
+            studentId = saved.student?.id ?: throw ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "수업에 학생 정보가 없습니다"
+            ),
             status = saved.status,
             startAt = saved.startAt,
             endAt = saved.endAt
@@ -81,7 +89,13 @@ class LessonService(
         try {
             return LocalDateTime.parse(startAtStr)
         } catch (e: DateTimeParseException) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "startAt must be a valid ISO-8601 datetime: ${e.message}")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "startAt은 유효한 ISO-8601 날짜시간이어야 합니다: ${e.message}")
+        }
+    }
+
+    private fun validateStartAt(startAt: LocalDateTime) {
+        if (startAt.minute % 30 != 0 || startAt.second != 0 || startAt.nano != 0) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "startAt은 분이 :00 또는 :30이어야 하며 초와 나노초는 0이어야 합니다")
         }
     }
 }

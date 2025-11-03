@@ -6,6 +6,9 @@ import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.FetchType
 import java.time.LocalDateTime
 
 @Entity
@@ -13,14 +16,23 @@ class Lesson(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,
-    var courseId: Long = 0,
-    var teacherId: Long = 0,
-    var studentId: Long = 0,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id")
+    var course: Course? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "teacher_id")
+    var teacher: Teacher? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_id")
+    var student: Student? = null,
+
     @Enumerated(EnumType.STRING)
     var status: LessonStatus = LessonStatus.BOOKED,
     var startAt: LocalDateTime = LocalDateTime.now(),
     var endAt: LocalDateTime = LocalDateTime.now().plusMinutes(20)
 ) {
-    constructor() : this(null, 0, 0, 0, LessonStatus.BOOKED, LocalDateTime.now(), LocalDateTime.now().plusMinutes(20))
+    constructor() : this(null, null, null, null, LessonStatus.BOOKED, LocalDateTime.now(), LocalDateTime.now().plusMinutes(20))
 }
-
