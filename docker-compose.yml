@@ -1,0 +1,18 @@
+# ==================================================================
+# docker-compose.yml (Entry file / README)
+# ==================================================================
+# 이 파일은 환경별 Compose 파일을 가리키는 안내용(Entry) 파일입니다.
+# - 개발용:     docker-compose.dev.yml
+# - 프로덕션:   docker-compose.prod.yml (추후 추가)
+#
+# 사용 예 (Windows cmd):
+#  - 개발 실행: docker-compose -f docker-compose.dev.yml up -d
+#  - 개발 중지: docker-compose -f docker-compose.dev.yml down
+#  - 개발 정리(볼륨 포함): docker-compose -f docker-compose.dev.yml down -v
+#
+# 의도: 실수로 `docker-compose up`만 실행해 엉뚱한 환경이 띄워지는 일을 방지하기 위함입니다.
+# 필요하면 이 파일에 공통 설정을 두고 환경별 파일에서 오버라이드하는 방식으로 확장하세요.
+# ==================================================================
+
+version: '3.8'
+services: {}

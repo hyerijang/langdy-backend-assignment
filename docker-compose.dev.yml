@@ -1,0 +1,60 @@
+# ==================================================================
+# docker-compose.dev.yml (Development) - 로컬 개발/테스트 전용
+# ==================================================================
+# 용도: 이 파일은 개발자 로컬 환경에서 애플리케이션과 MySQL을
+#       빠르게 실행하기 위해 제공됩니다. 프로덕션 환경에서의
+#       보안, 백업, 모니터링, 스케일링 요구사항을 충족하지 않습니다.
+# 주의:
+# - 개발용 데이터는 named volume(`langdy_mysql_data`)에 저장됩니다. 이 볼륨은
+#   `docker-compose -f docker-compose.dev.yml down -v` 명령으로 제거하지 않는 한 유지됩니다.
+# - 프로덕션에서는 별도의 관리되는 DB(예: RDS), 비밀 값 관리, 백업 정책,
+#   운영용 Compose/Swarm/Kubernetes 구성을 사용하세요.
+# 사용 예:
+# 1) 개발 실행: docker-compose -f docker-compose.dev.yml up -d
+# 2) 개발 중지: docker-compose -f docker-compose.dev.yml down
+# 3) 데이터까지 제거: docker-compose -f docker-compose.dev.yml down -v
+# 4) 로그 보기: docker logs -f langdy-mysql
+# 환경 변수(Windows cmd 예시):
+#    set SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/langdydb?useSSL=false&serverTimezone=UTC
+#    set SPRING_DATASOURCE_USERNAME=langdy
+#    set SPRING_DATASOURCE_PASSWORD=langdy_pass
+# ==================================================================
+
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.1
+    container_name: langdy-mysql
+    # restart: on-failure
+    # - 컨테이너가 비정상 종료(종료 코드 != 0)한 경우에만 자동 재시작합니다.
+    # - 토이/개발 환경에서 무한 재시작을 피하면서 일시적 오류에는 자동 복구를 원할 때 적합합니다.
+    restart: "on-failure"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: langdydb
+      MYSQL_USER: langdy
+      MYSQL_PASSWORD: langdy_pass
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
+
+# Swarm 모드에서 재시도 횟수 제한이 필요하면 아래 deploy.restart_policy를 사용하세요 (Compose 일반 모드에서는 무시됨).
+# deploy:
+#   restart_policy:
+#     condition: on-failure
+#     max_attempts: 3
+#
+# 권장 행동 (개발 환경):
+# - 개발이 끝나면 불필요한 컨테이너/볼륨을 정리하세요: docker-compose -f docker-compose.dev.yml down -v
+# - 이 파일은 개발용이므로 민감 정보(실제 비밀번호 등)는 사용하지 마세요.
+
