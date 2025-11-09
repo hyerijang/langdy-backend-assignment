@@ -9,6 +9,13 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 
+/**
+ * 수강생을 나타내는 엔티티입니다.
+ *
+ * @property id DB 상의 식별자 (자동 생성)
+ * @property name 수강생 이름
+ * @property os 수강생이 사용하는 운영체제 ([Os])
+ */
 @Entity
 class Student(
     @Id

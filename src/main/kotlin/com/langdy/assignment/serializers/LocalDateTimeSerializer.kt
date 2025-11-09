@@ -9,6 +9,11 @@ import kotlinx.serialization.encoding.Encoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * kotlinx.serialization용 [LocalDateTime] 직렬화/역직렬화 구현입니다.
+ *
+ * ISO_LOCAL_DATE_TIME 포맷을 사용하여 문자열로 인코딩/디코딩합니다.
+ */
 object LocalDateTimeSerializer : KSerializer<LocalDateTime> {
     private val formatter: DateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
     override val descriptor: SerialDescriptor =

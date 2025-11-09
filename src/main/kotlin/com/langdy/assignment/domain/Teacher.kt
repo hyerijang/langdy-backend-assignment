@@ -7,6 +7,12 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.OneToMany
 
+/**
+ * 강사를 나타내는 엔티티입니다.
+ *
+ * @property id DB 상의 식별자 (자동 생성)
+ * @property name 강사 이름
+ */
 @Entity
 class Teacher(
     @Id
