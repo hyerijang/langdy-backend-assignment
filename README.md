@@ -199,7 +199,7 @@ if (studentId) -> 앱 알림 or SMS
 
 ```bash
 # 프로젝트 루트에서
-docker compose -f docker-compose.dev.yml up -d
+docker-compose -f docker-compose.dev.yml up -d
 ```
 
 - Windows (cmd.exe):
