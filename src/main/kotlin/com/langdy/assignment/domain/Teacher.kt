@@ -28,6 +28,4 @@ class Teacher(
             lesson.teacher = null
         }
     }
-
-    constructor() : this(null, "")
 }

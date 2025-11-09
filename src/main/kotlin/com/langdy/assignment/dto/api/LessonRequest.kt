@@ -1,5 +1,4 @@
-package com.langdy.assignment.dto
-
+package com.langdy.assignment.dto.api
 
 import com.langdy.assignment.serializers.LocalDateTimeSerializer
 import kotlinx.serialization.Contextual

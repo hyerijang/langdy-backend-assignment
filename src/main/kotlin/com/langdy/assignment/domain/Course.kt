@@ -29,6 +29,4 @@ class Course(
             lesson.course = null
         }
     }
-
-    constructor() : this(null, "")
 }

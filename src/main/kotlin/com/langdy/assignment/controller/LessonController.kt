@@ -1,7 +1,7 @@
 package com.langdy.assignment.controller
 
-import com.langdy.assignment.dto.LessonRequest
-import com.langdy.assignment.dto.LessonResponse
+import com.langdy.assignment.dto.api.LessonRequest
+import com.langdy.assignment.dto.api.LessonResponse
 import com.langdy.assignment.service.LessonService
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController
 class LessonController(
     private val lessonService: LessonService,
 ) {
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun createLesson(

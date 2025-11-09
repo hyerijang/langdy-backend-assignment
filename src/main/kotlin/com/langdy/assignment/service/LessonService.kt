@@ -2,14 +2,15 @@ package com.langdy.assignment.service
 
 import com.langdy.assignment.domain.Lesson
 import com.langdy.assignment.domain.LessonStatus
-import com.langdy.assignment.dto.LessonRequest
-import com.langdy.assignment.dto.LessonResponse
+import com.langdy.assignment.dto.api.LessonRequest
+import com.langdy.assignment.dto.api.LessonResponse
 import com.langdy.assignment.repository.CourseRepository
 import com.langdy.assignment.repository.LessonRepository
 import com.langdy.assignment.repository.StudentRepository
 import com.langdy.assignment.repository.TeacherRepository
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 
@@ -20,7 +21,7 @@ class LessonService(
     private val studentRepository: StudentRepository,
     private val courseRepository: CourseRepository,
 ) {
-
+    @Transactional
     fun createLesson(
         request: LessonRequest,
         studentId: Long,
@@ -31,8 +32,11 @@ class LessonService(
         val student = findStudentOrThrow(studentId)
         val course = findCourseOrThrow(request.courseId)
 
-        ensureTeacherAvailable(teacher.id!!, request.startAt)
-        ensureStudentAvailable(student.id!!, request.startAt)
+        val teacherId = requireNotNull(teacher.id) { "Teacher id must not be null for existing teacher" }
+        val studentIdNonNull = requireNotNull(student.id) { "Student id must not be null for existing student" }
+
+        ensureTeacherAvailable(teacherId, request.startAt)
+        ensureStudentAvailable(studentIdNonNull, request.startAt)
 
         val lesson =
             Lesson(

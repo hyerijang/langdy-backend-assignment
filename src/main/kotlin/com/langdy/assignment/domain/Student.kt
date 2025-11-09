@@ -34,6 +34,4 @@ class Student(
             lesson.student = null
         }
     }
-
-    constructor() : this(null, "", Os.ANDROID)
 }
