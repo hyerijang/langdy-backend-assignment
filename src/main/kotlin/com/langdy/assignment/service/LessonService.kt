@@ -4,7 +4,6 @@ import com.langdy.assignment.domain.Lesson
 import com.langdy.assignment.domain.LessonStatus
 import com.langdy.assignment.dto.LessonRequest
 import com.langdy.assignment.dto.LessonResponse
-import com.langdy.assignment.dto.TeacherDto
 import com.langdy.assignment.repository.CourseRepository
 import com.langdy.assignment.repository.LessonRepository
 import com.langdy.assignment.repository.StudentRepository
@@ -21,13 +20,6 @@ class LessonService(
     private val studentRepository: StudentRepository,
     private val courseRepository: CourseRepository,
 ) {
-    fun findAvailableTeachers(
-        courseId: Long,
-        startAt: LocalDateTime,
-    ): List<TeacherDto> {
-        validateStartAt(startAt)
-        return teacherRepository.findAvailableTeachers(courseId, startAt)
-    }
 
     fun createLesson(
         request: LessonRequest,
@@ -98,8 +90,4 @@ class LessonService(
             throw ResponseStatusException(HttpStatus.CONFLICT, "요청한 시간에 학생이 예약되어 있습니다")
         }
     }
-
-    // TODO : 제거
-//    private fun internalError(message: String): ResponseStatusException =
-//        ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message)
 }
