@@ -79,3 +79,7 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+tasks.named("runKtlintCheckOverMainSourceSet") {
+    dependsOn("kaptKotlin")
+}
