@@ -9,9 +9,18 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.Table
+import jakarta.persistence.UniqueConstraint
 import java.time.LocalDateTime
 
 @Entity
+@Table(
+    name = "lesson",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uq_lesson_teacher_start_at", columnNames = ["teacher_id", "start_at"]),
+        UniqueConstraint(name = "uq_lesson_student_start_at", columnNames = ["student_id", "start_at"]),
+    ],
+)
 class Lesson(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

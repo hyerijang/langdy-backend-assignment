@@ -44,12 +44,13 @@ class LessonService(
 
         val lesson =
             Lesson(
-                course = course,
-                teacher = teacher,
-                student = student,
-                status = LessonStatus.BOOKED,
-                startAt = request.startAt,
-                endAt = request.startAt.plusMinutes(20),
+                null,
+                course,
+                teacher,
+                student,
+                LessonStatus.BOOKED,
+                request.startAt,
+                request.startAt.plusMinutes(20),
             )
 
         val saved = lessonRepository.save(lesson)
@@ -98,6 +99,7 @@ class LessonService(
         }
     }
 
-    private fun internalError(message: String): ResponseStatusException =
-        ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message)
+    // TODO : 제거
+//    private fun internalError(message: String): ResponseStatusException =
+//        ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, message)
 }
