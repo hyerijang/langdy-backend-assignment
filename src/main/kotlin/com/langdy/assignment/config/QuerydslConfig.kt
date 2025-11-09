@@ -1,4 +1,4 @@
-package com.langdy.langdy_backend_assignment.config
+package com.langdy.assignment.config
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
@@ -6,8 +6,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class QuerydslConfig(private val em: EntityManager) {
+class QuerydslConfig(
+    private val em: EntityManager,
+) {
     @Bean
     fun jpaQueryFactory(): JPAQueryFactory = JPAQueryFactory(em)
 }
-

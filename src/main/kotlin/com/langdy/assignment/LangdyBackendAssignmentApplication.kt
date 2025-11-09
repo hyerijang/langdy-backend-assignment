@@ -1,4 +1,4 @@
-package com.langdy.langdy_backend_assignment
+package com.langdy.assignment
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class LangdyBackendAssignmentApplication
 
 fun main(args: Array<String>) {
-	runApplication<LangdyBackendAssignmentApplication>(*args)
+    runApplication<LangdyBackendAssignmentApplication>(*args)
 }
