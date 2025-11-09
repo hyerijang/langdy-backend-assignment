@@ -4,14 +4,14 @@ import com.langdy.assignment.domain.Lesson
 import com.langdy.assignment.domain.LessonStatus
 import com.langdy.assignment.dto.api.LessonRequest
 import com.langdy.assignment.dto.api.LessonResponse
+import com.langdy.assignment.exception.CustomException
+import com.langdy.assignment.exception.ErrorCode
 import com.langdy.assignment.repository.CourseRepository
 import com.langdy.assignment.repository.LessonRepository
 import com.langdy.assignment.repository.StudentRepository
 import com.langdy.assignment.repository.TeacherRepository
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 
 @Service
@@ -55,34 +55,31 @@ class LessonService(
 
     private fun validateStartAt(startAt: LocalDateTime) {
         if (startAt.minute % 30 != 0 || startAt.second != 0 || startAt.nano != 0) {
-            throw ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "startAt은 분이 :00 또는 :30이어야 하며 초와 나노초는 0이어야 합니다",
-            )
+            throw CustomException(ErrorCode.INVALID_START_AT)
         }
     }
 
     private fun findTeacherOrThrow(teacherId: Long) =
         teacherRepository
             .findById(teacherId)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "선생님을 찾을 수 없습니다") }
+            .orElseThrow { CustomException(ErrorCode.TEACHER_NOT_FOUND) }
 
     private fun findStudentOrThrow(studentId: Long) =
         studentRepository
             .findById(studentId)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "학생을 찾을 수 없습니다") }
+            .orElseThrow { CustomException(ErrorCode.STUDENT_NOT_FOUND) }
 
     private fun findCourseOrThrow(courseId: Long) =
         courseRepository
             .findById(courseId)
-            .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "강좌를 찾을 수 없습니다") }
+            .orElseThrow { CustomException(ErrorCode.COURSE_NOT_FOUND) }
 
     private fun ensureTeacherAvailable(
         teacherId: Long,
         startAt: LocalDateTime,
     ) {
         if (lessonRepository.existsBookedLessonForTeacher(teacherId, startAt, LessonStatus.BOOKED)) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "요청한 시간에 선생님이 예약되어 있습니다")
+            throw CustomException(ErrorCode.TEACHER_ALREADY_BOOKED)
         }
     }
 
@@ -91,7 +88,7 @@ class LessonService(
         startAt: LocalDateTime,
     ) {
         if (lessonRepository.existsBookedLessonForStudent(studentId, startAt, LessonStatus.BOOKED)) {
-            throw ResponseStatusException(HttpStatus.CONFLICT, "요청한 시간에 학생이 예약되어 있습니다")
+            throw CustomException(ErrorCode.STUDENT_ALREADY_BOOKED)
         }
     }
 }

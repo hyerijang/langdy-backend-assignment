@@ -3,6 +3,7 @@ package com.langdy.assignment.controller
 import com.langdy.assignment.dto.projection.TeacherQueryDto
 import com.langdy.assignment.service.TeacherService
 import org.springframework.format.annotation.DateTimeFormat
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -18,5 +19,6 @@ class TeacherController(
     fun getAvailableTeachers(
         @RequestParam courseId: Long,
         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") startAt: LocalDateTime,
-    ): List<TeacherQueryDto> = teacherService.findAvailableTeachers(courseId, startAt)
+    ): ResponseEntity<List<TeacherQueryDto>> =
+        ResponseEntity.ok(teacherService.findAvailableTeachers(courseId, startAt))
 }
