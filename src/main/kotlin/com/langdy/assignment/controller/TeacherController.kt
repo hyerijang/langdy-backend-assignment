@@ -18,7 +18,7 @@ class TeacherController(
     @GetMapping("/available")
     fun getAvailableTeachers(
         @RequestParam courseId: Long,
-        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") startAt: LocalDateTime,
+        @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") startAt: LocalDateTime,
     ): ResponseEntity<List<TeacherQueryDto>> =
         ResponseEntity.ok(teacherService.findAvailableTeachers(courseId, startAt))
 }
